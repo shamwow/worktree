@@ -2,6 +2,8 @@
 
 Git worktree management for AI coding tools. Create, switch between, and clean up worktrees without leaving your conversation.
 
+Claude Code supports worktrees via `claude --worktree`. The key difference between this plugin and the native plugin is the ability to manage worktrees from the same conversation vs having to exit and run claude again with --worktree.
+
 Works with **Claude Code** (plugin) and **Codex CLI** (AGENTS.md).
 
 ## Install
