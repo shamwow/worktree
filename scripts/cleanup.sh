@@ -38,7 +38,7 @@ WORKTREE_PATH=$(git worktree list --porcelain | awk -v branch="$BRANCH_NAME" '
 MAIN_WORKTREE=$(git worktree list --porcelain | head -1 | sed 's/^worktree //')
 
 # If we're currently in the worktree being removed, switch to main
-CURRENT_PATH=$(pwd)
+CURRENT_PATH=$(pwd -P)
 if [ -n "$WORKTREE_PATH" ] && [ "$CURRENT_PATH" = "$WORKTREE_PATH" ]; then
   echo "SWITCH:${MAIN_WORKTREE}"
 fi

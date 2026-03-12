@@ -4,18 +4,9 @@ git rev-parse --show-toplevel >/dev/null 2>&1 || { echo "Error: not in a git rep
 
 GIT_ROOT=$(git rev-parse --show-toplevel)
 REPO_NAME=$(basename "$GIT_ROOT")
-WORKTREE_PREFIX="/tmp/claude-worktrees/${REPO_NAME}/"
-CURRENT=$(pwd)
+WORKTREE_PREFIX="$(cd /tmp 2>/dev/null && pwd -P)/claude-worktrees/${REPO_NAME}/"
+CURRENT=$(pwd -P)
 ARG="$1"
-
-# --- Status ---
-CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
-if [ "$CURRENT" = "$GIT_ROOT" ]; then
-  echo "On $CURRENT_BRANCH (main worktree)"
-else
-  echo "On $CURRENT_BRANCH at $CURRENT"
-fi
-echo ""
 
 # --- List worktrees ---
 i=0
@@ -40,11 +31,21 @@ while IFS= read -r line; do
   fi
 done < <(git worktree list)
 
-# --- No argument: just list ---
+# --- No argument: show status and list ---
 if [ -z "$ARG" ]; then
+  CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
+  echo ""
+  if [ "$CURRENT" = "$GIT_ROOT" ]; then
+    echo "On $CURRENT_BRANCH (main worktree)"
+  else
+    echo "On $CURRENT_BRANCH at $CURRENT"
+  fi
   if [ "$i" -le 1 ]; then
     echo ""
     echo "Only one worktree exists. Use /tree <name> to create a new one."
+  else
+    echo ""
+    echo "SELECT: Pick a number to switch, or a name to create a new worktree."
   fi
   exit 0
 fi
@@ -73,7 +74,7 @@ if [ -z "$DEFAULT_BRANCH" ]; then
   fi
 fi
 
-WORKTREE_PATH="/tmp/claude-worktrees/${REPO_NAME}/${BRANCH_NAME}"
+WORKTREE_PATH="${WORKTREE_PREFIX}${BRANCH_NAME}"
 
 git fetch origin "$DEFAULT_BRANCH" 2>/dev/null
 
