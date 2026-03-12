@@ -30,24 +30,6 @@ Use the scripts at ~/.worktree/scripts/ for worktree operations.
 See ~/.worktree/AGENTS.md for usage details.
 ```
 
-### Standalone (any terminal)
-
-The scripts work on their own — no AI tool required:
-
-```bash
-git clone https://github.com/shamwow/worktree.git ~/.worktree
-
-# Add to your shell profile:
-wt() {
-  output=$(~/.worktree/scripts/tree.sh "$@" 2>&1)
-  echo "$output"
-  switch_path=$(echo "$output" | grep '^SWITCH:' | head -1 | cut -d: -f2-)
-  [ -n "$switch_path" ] && cd "$switch_path"
-}
-```
-
-Then: `wt`, `wt 2`, `wt my-feature`
-
 ## Commands
 
 ### `tree [number | branch-name]`
