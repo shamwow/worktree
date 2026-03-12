@@ -3,10 +3,15 @@
 git rev-parse --show-toplevel >/dev/null 2>&1 || { echo "Error: not in a git repo."; exit 1; }
 
 GIT_ROOT=$(git rev-parse --show-toplevel)
-REPO_NAME=$(basename "$GIT_ROOT")
-WORKTREE_PREFIX="$(cd /tmp 2>/dev/null && pwd -P)/claude-worktrees/${REPO_NAME}/"
+WORKTREE_PREFIX="${GIT_ROOT}/.worktrees/"
 CURRENT=$(pwd -P)
 ARG="$1"
+
+# Ensure .worktrees is gitignored
+if [ ! -f "${GIT_ROOT}/.worktrees/.gitignore" ]; then
+  mkdir -p "${GIT_ROOT}/.worktrees"
+  echo "*" > "${GIT_ROOT}/.worktrees/.gitignore"
+fi
 
 # --- List worktrees ---
 i=0
