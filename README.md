@@ -1,48 +1,86 @@
 # worktree
 
-A Claude Code plugin for git worktree workflows. Create, switch between, and clean up worktrees without leaving your conversation.
+Git worktree management for AI coding tools. Create, switch between, and clean up worktrees without leaving your conversation.
+
+Works with **Claude Code** (plugin) and **Codex CLI** (AGENTS.md).
 
 ## Install
 
+### Claude Code
+
 ```bash
-claude plugin add /path/to/worktree
-# or from GitHub:
-claude plugin add shahmeer-amir/worktree
+claude plugin add shamwow/worktree
 ```
+
+This gives you `/tree`, `/cleanup`, and `/pr` slash commands.
+
+### Codex CLI
+
+Clone the repo and copy the AGENTS.md snippet into your project:
+
+```bash
+git clone https://github.com/shamwow/worktree.git ~/.worktree
+```
+
+Then add to your project's `AGENTS.md`:
+
+```markdown
+## Worktree management
+Use the scripts at ~/.worktree/scripts/ for worktree operations.
+See ~/.worktree/AGENTS.md for usage details.
+```
+
+### Standalone (any terminal)
+
+The scripts work on their own — no AI tool required:
+
+```bash
+git clone https://github.com/shamwow/worktree.git ~/.worktree
+
+# Add to your shell profile:
+wt() {
+  output=$(~/.worktree/scripts/tree.sh "$@" 2>&1)
+  echo "$output"
+  switch_path=$(echo "$output" | grep '^SWITCH:' | head -1 | cut -d: -f2-)
+  [ -n "$switch_path" ] && cd "$switch_path"
+}
+```
+
+Then: `wt`, `wt 2`, `wt my-feature`
 
 ## Commands
 
-### `/tree`
+### `tree [number | branch-name]`
 
-Shows your current worktree status and lists all worktrees for the repo.
-
-```
-/tree                 # show status + list worktrees
-/tree 2               # switch to worktree #2
-/tree my-feature      # create (or switch to) a worktree for branch "my-feature"
-```
-
-New branches are created off the default branch. Worktrees live at `/tmp/claude-worktrees/<repo>/<branch>`.
-
-### `/cleanup [branch]`
-
-Remove a worktree and delete its branch. If no branch name is given, cleans up the current branch. Switches back to the main worktree automatically.
+Shows current worktree status and lists all worktrees.
 
 ```
-/cleanup my-feature   # remove specific branch
-/cleanup              # remove current branch
+tree                  # show status + list worktrees
+tree 2                # switch to worktree #2
+tree my-feature       # create (or switch to) a worktree for "my-feature"
 ```
 
-### `/pr [title]`
+New branches are created off the default branch. Worktrees live at `<repo>/.worktrees/<branch>`.
 
-Push the current branch and create a pull request. Uses `gh` CLI under the hood.
+### `cleanup [branch]`
+
+Remove a worktree and delete its branch. Defaults to current branch if none given.
 
 ```
-/pr                       # create PR with auto-generated title
-/pr "Add user auth"       # create PR with custom title
+cleanup my-feature    # remove specific branch
+cleanup               # remove current branch
+```
+
+### `pr [title]`
+
+Push current branch and create a pull request.
+
+```
+pr                        # create PR with auto-generated title
+pr "Add user auth"        # create PR with custom title
 ```
 
 ## Requirements
 
 - Git
-- GitHub CLI (`gh`) — for `/pr` command only
+- GitHub CLI (`gh`) — for `pr` only
